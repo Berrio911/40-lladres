@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Control de pagos de la escuadra 40 Lladres">
+  <meta name="theme-color" content="#7f1d1d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="40 Lladres">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231e3a8a;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%230f172a;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' fill='url(%23grad)' rx='40'/%3E%3Ctext x='96' y='120' font-size='80' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3E⚔️%3C/text%3E%3C/svg%3E">
+  <title>40 Lladres - Control de Pagos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      min-height: 100vh;
+      padding: 0;
+    }
+    
+    .app-container {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      color: white;
+      padding: 20px 20px 30px;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .header .subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .balance-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin: -20px 20px 0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .balance-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .balance-amount {
+      font-size: 32px;
+      font-weight: 700;
+      color: #dc2626;
+      margin-bottom: 12px;
+    }
+    
+    .balance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .balance-item {
+      text-align: center;
+    }
+    
+    .balance-item-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    
+    .balance-item-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .balance-item-value.positive {
+      color: #10b981;
+    }
+    
+    .balance-item-value.negative {
+      color: #ef4444;
+    }
+    
+    .tabs {
+      display: flex;
+      background: #f8f9fa;
+      padding: 4px;
+      margin: 20px 20px 0;
+      border-radius: 12px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      background: white;
+      color: #dc2626;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1a1a1a;
+    }
+    
+    .member-payment-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .member-payment-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .member-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 18px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    .member-info {
+      flex: 1;
+    }
+    
+    .member-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+    
+    .member-status {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .payment-status {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .payment-status-item {
+      text-align: center;
+      flex: 1;
+    }
+    
+    .payment-status-label {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    
+    .payment-status-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .payment-item {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .payment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    
+    .payment-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .payment-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: #10b981;
+    }
+    
+    .payment-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .payment-category {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .category-cuota {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .category-comida {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .category-vestuario {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+    
+    .category-transporte {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .category-fiesta {
+      background: #fce7f3;
+      color: #9f1239;
+    }
+    
+    .category-alojamiento {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .category-otros {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    
+    .member-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    
+    .member-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .member-account {
+      font-size: 13px;
+      color: #666;
+      font-family: monospace;
+    }
+    
+    .member-details {
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 12px;
+    }
+    
+    .member-detail-item {
+      font-size: 14px;
+      color: #666;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .delete-member {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    
+    .delete-member:hover {
+      background: #fee2e2;
+    }
+    
+    .add-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      color: white;
+      border: none;
+      font-size: 32px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(127, 29, 29, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: transform 0.2s;
+    }
+    
+    .add-button:active {
+      transform: scale(0.95);
+    }
+    
+    .fab-menu {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 99;
+    }
+    
+    .fab-menu.active {
+      display: flex;
+    }
+    
+    .fab-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    
+    .fab-item-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #dc2626;
+      color: #dc2626;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .fab-item-label {
+      background: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      white-space: nowrap;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: flex-end;
+      animation: fadeIn 0.2s;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      animation: slideUp 0.3s;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 16px;
+      background: white;
+      transition: all 0.2s;
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    
+    .submit-button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .submit-button:active {
+      transform: scale(0.98);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+    
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    .empty-state p {
+      font-size: 15px;
+    }
+    
+    .info-banner {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #991b1b;
+      line-height: 1.5;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .status-badge.paid {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-badge.pending {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .settings-section {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .settings-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+    
+    .logo-preview {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+    }
+    
+    .logo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .logo-placeholder {
+      font-size: 48px;
+    }
+    
+    .secondary-button {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #dc2626;
+      border: 2px solid #dc2626;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    
+    .secondary-button:hover {
+      background: #fee2e2;
+    }
+    
+    .secondary-button.danger {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+    
+    .secondary-button.danger:hover {
+      background: #fee2e2;
+    }
+    
+    .photo-upload-area {
+      text-align: center;
+      cursor: pointer;
+      padding: 20px;
+      border: 2px dashed #e5e7eb;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    
+    .photo-upload-area:hover {
+      border-color: #dc2626;
+      background: #f9fafb;
+    }
+    
+    .photo-preview {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+    }
+    
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .photo-placeholder {
+      font-size: 40px;
+    }
+    
+    .photo-upload-text {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .member-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .service-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .service-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .service-amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: #dc2626;
+    }
+    
+    .service-info {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .service-members-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    
+    .service-member-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .service-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .action-button {
+      flex: 1;
+      padding: 8px 12px;
+      background: white;
+      color: #dc2626;
+      border: 1px solid #dc2626;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-button:hover {
+      background: #fee2e2;
+    }
+    
+    .action-button.danger {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+    
+    .action-button.danger:hover {
+      background: #fee2e2;
+    }
+    
+    .member-checkbox-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .member-checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    
+    .member-checkbox-label {
+      flex: 1;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    
+    .historic-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .historic-card:hover {
+      border-color: #dc2626;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .historic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .historic-year {
+      font-size: 18px;
+      font-weight: 700;
+      color: #dc2626;
+    }
+    
+    .historic-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .historic-stat {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .historic-stat-label {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .historic-stat-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    
+    .modal-historic-detail {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .historic-section {
+      margin-bottom: 20px;
+    }
+    
+    .historic-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .copy-summary-button {
+      background: linear-gradient(135deg, #1a1a1a 0%, #7f1d1d 100%);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      white-space: nowrap;
+    }
+    
+    .copy-summary-button:active {
+      transform: scale(0.95);
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1>⚔️ 40 Lladres</h1>
+      <div class="subtitle">Control de pagos y cuotas</div>
+    </div>
+    
+    <div class="balance-card">
+      <div class="balance-label">Total solicitado</div>
+      <div class="balance-amount" id="totalRequested">€0.00</div>
+      <div class="balance-grid">
+        <div class="balance-item">
+          <div class="balance-item-label">✅ Pagado</div>
+          <div class="balance-item-value positive" id="totalPaid">€0.00</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-item-label">⏳ Pendiente</div>
+          <div class="balance-item-value negative" id="totalPending">€0.00</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('overview')">Resumen</button>
+      <button class="tab" onclick="switchTab('payments')">Pagos</button>
+      <button class="tab" onclick="switchTab('services')">Servicios</button>
+      <button class="tab" onclick="switchTab('group')">Escuadra</button>
+      <button class="tab" onclick="switchTab('settings')">Ajustes</button>
+    </div>
+    
+    <div class="content" id="overviewContent">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div class="section-title" style="margin-bottom: 0;">Estado de pagos por miembro</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="copy-summary-button" onclick="sendEmailReminder()">
+            📧 Enviar recordatorio
+          </button>
+          <button class="copy-summary-button" onclick="copySummaryToClipboard()">
+            📋 Copiar resumen
+          </button>
+        </div>
+      </div>
+      <div id="memberPaymentsList"></div>
+    </div>
+    
+    <div class="content" id="paymentsContent" style="display: none;">
+      <div class="section-title">Historial de pagos</div>
+      <div id="paymentsList"></div>
+    </div>
+    
+    <div class="content" id="servicesContent" style="display: none;">
+      <div class="section-title">Servicios y suscripciones</div>
+      <div class="info-banner">
+        💡 Gestiona los servicios recurrentes de la escuadra (alquiler, luz, agua, etc.)
+      </div>
+      <div id="servicesList"></div>
+    </div>
+    
+    <div class="content" id="groupContent" style="display: none;">
+      <div class="section-title">Miembros de la escuadra</div>
+      <div class="info-banner">
+        💡 Añade los números de cuenta IBAN para facilitar las transferencias
+      </div>
+      <div id="membersList"></div>
+    </div>
+    
+    <div class="content" id="settingsContent" style="display: none;">
+      <div class="section-title">Configuración</div>
+      
+      <div class="settings-section">
+        <div class="settings-label">Logo de la escuadra</div>
+        <div class="logo-preview" id="logoPreview">
+          <div class="logo-placeholder">⚔️</div>
+        </div>
+        <input type="file" id="logoInput" accept="image/*" style="display: none;" onchange="uploadLogo(event)">
+        <button class="secondary-button" onclick="document.getElementById('logoInput').click()">
+          📸 Cambiar logo
+        </button>
+        <button class="secondary-button danger" onclick="removeLogo()" id="removeLogoBtn" style="display: none;">
+          🗑️ Eliminar logo
+        </button>
+      </div>
+      
+      <div class="settings-section">
+        <div class="settings-label">Gestión de históricos</div>
+        <div style="background: #fee2e2; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+          <div style="font-size: 13px; color: #991b1b; margin-bottom: 4px;">Año actual</div>
+          <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="currentYearDisplay">2024</div>
+        </div>
+        
+        <button class="secondary-button" onclick="closeCurrentYear()">
+          📦 Cerrar año y crear histórico
+        </button>
+        
+        <div style="margin-top: 20px;">
+          <div class="settings-label">Históricos guardados</div>
+          <div id="historicsList"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fab-menu" id="fabMenu">
+      <div class="fab-item" onclick="openRequestPayment()">
+        <div class="fab-item-label">Solicitar cuota</div>
+        <div class="fab-item-button">💰</div>
+      </div>
+      <div class="fab-item" onclick="openAddPayment()">
+        <div class="fab-item-label">Registrar pago</div>
+        <div class="fab-item-button">✓</div>
+      </div>
+    </div>
+    
+    <button class="add-button" id="addButton" onclick="toggleFabMenu()">+</button>
+  </div>
+  
+  <div class="toast" id="toast">✅ Resumen copiado al portapapeles</div>
+  
+  <!-- Modal para registrar pago -->
+  <div class="modal" id="addPaymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Registrar pago</div>
+        <button class="close-button" onclick="closeModal()">&times;</button>
+      </div>
+      
+      <form onsubmit="addPayment(event)">
+        <div class="form-group">
+          <label class="form-label">Miembro que paga</label>
+          <select class="form-select" id="paymentMember" required></select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Concepto</label>
+          <input type="text" class="form-input" id="paymentConcept" placeholder="Ej: Cuota fiestas 2024" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Cantidad (€)</label>
+          <input type="number" class="form-input" id="paymentAmount" placeholder="0.00" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" id="paymentCategory">
+            <option value="cuota">💰 Cuota</option>
+            <option value="comida">🍽️ Comida y bebida</option>
+            <option value="vestuario">👔 Vestuario</option>
+            <option value="transporte">🚗 Transporte</option>
+            <option value="alojamiento">🏠 Alojamiento</option>
+            <option value="fiesta">🎉 Fiesta</option>
+            <option value="otros">📌 Otros</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="submit-button">Registrar pago</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para solicitar cuota -->
+  <div class="modal" id="requestPaymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Solicitar cuota</div>
+        <button class="close-button" onclick="closeModal()">&times;</button>
+      </div>
+      
+      <form onsubmit="requestPayment(event)">
+        <div class="form-group">
+          <label class="form-label">Concepto de la cuota</label>
+          <input type="text" class="form-input" id="requestConcept" placeholder="Ej: Cuota fiestas 2024" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Cantidad por persona (€)</label>
+          <input type="number" class="form-input" id="requestAmount" placeholder="0.00" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" id="requestCategory">
+            <option value="cuota">💰 Cuota</option>
+            <option value="comida">🍽️ Comida y bebida</option>
+            <option value="vestuario">👔 Vestuario</option>
+            <option value="transporte">🚗 Transporte</option>
+            <option value="alojamiento">🏠 Alojamiento</option>
+            <option value="fiesta">🎉 Fiesta</option>
+            <option value="otros">📌 Otros</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Fecha límite (opcional)</label>
+          <input type="date" class="form-input" id="requestDeadline">
+        </div>
+        
+        <button type="submit" class="submit-button">Solicitar cuota</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para añadir miembro -->
+  <div class="modal" id="addMemberModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Añadir miembro</div>
+        <button class="close-button" onclick="closeModal()">&times;</button>
+      </div>
+      
+      <form onsubmit="addMember(event)">
+        <div class="form-group">
+          <label class="form-label">Foto del miembro</label>
+          <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('memberPhotoInput').click()">
+            <div class="photo-preview" id="photoPreview">
+              <div class="photo-placeholder">📷</div>
+            </div>
+            <div class="photo-upload-text">Toca para añadir foto</div>
+          </div>
+          <input type="file" id="memberPhotoInput" accept="image/*" style="display: none;" onchange="previewMemberPhoto(event)">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input type="text" class="form-input" id="memberName" placeholder="Ej: Juan García" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-input" id="memberBirthdate">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="memberEmail" placeholder="ejemplo@correo.com">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Número de cuenta (IBAN)</label>
+          <input type="text" class="form-input" id="memberAccount" placeholder="ES91 2100 0418 4502 0005 1332" maxlength="34">
+        </div>
+        
+        <button type="submit" class="submit-button">Añadir miembro</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para crear servicio -->
+  <div class="modal" id="addServiceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Crear servicio</div>
+        <button class="close-button" onclick="closeModal()">&times;</button>
+      </div>
+      
+      <form onsubmit="addService(event)">
+        <div class="form-group">
+          <label class="form-label">Nombre del servicio</label>
+          <input type="text" class="form-input" id="serviceName" placeholder="Ej: Alquiler del local" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Importe total (€)</label>
+          <input type="number" class="form-input" id="serviceAmount" placeholder="0.00" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Periodicidad</label>
+          <select class="form-select" id="servicePeriod" required>
+            <option value="monthly">Mensual</option>
+            <option value="bimonthly">Bimensual</option>
+            <option value="quarterly">Trimestral</option>
+            <option value="annual">Anual</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Día de vencimiento</label>
+          <input type="number" class="form-input" id="serviceDueDay" placeholder="1-31" min="1" max="31" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">
+            <input type="checkbox" id="serviceReminder" style="width: auto; margin-right: 8px;">
+            Crear recordatorio en calendario
+          </label>
+        </div>
+        
+        <div class="form-group" id="reminderDaysGroup" style="display: none;">
+          <label class="form-label">Días de antelación</label>
+          <input type="number" class="form-input" id="reminderDays" placeholder="3" min="1" max="30" value="3">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Integrantes que pagan este servicio</label>
+          <div id="serviceMembers"></div>
+        </div>
+        
+        <button type="submit" class="submit-button">Crear servicio</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para ver histórico -->
+  <div class="modal" id="viewHistoricModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="historicModalTitle">Histórico 2024</div>
+        <button class="close-button" onclick="closeModal()">&times;</button>
+      </div>
+      
+      <div class="modal-historic-detail" id="historicDetailContent">
+        <!-- Se rellena dinámicamente -->
+      </div>
+      
+      <button class="secondary-button danger" onclick="deleteHistoric()" style="margin-top: 20px;">
+        🗑️ Eliminar histórico
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    let friends = [];
+    let payments = [];
+    let paymentRequests = [];
+    let services = [];
+    let historics = [];
+    let currentYear = new Date().getFullYear();
+    let currentTab = 'overview';
+    let fabMenuOpen = false;
+    let appLogo = null;
+    let tempMemberPhoto = null;
+    
+    // Load data from storage
+    async function loadData() {
+      try {
+        const friendsData = await window.storage.get('friends');
+        const paymentsData = await window.storage.get('payments');
+        const requestsData = await window.storage.get('paymentRequests');
+        const servicesData = await window.storage.get('services');
+        const historicsData = await window.storage.get('historics');
+        const currentYearData = await window.storage.get('currentYear');
+        const logoData = await window.storage.get('appLogo');
+        
+        if (friendsData && friendsData.value) {
+          friends = JSON.parse(friendsData.value);
+        } else {
+          friends = [
+            { id: 1, name: 'Tú', initials: 'TU', account: '', birthdate: '', email: '', photo: null, amountPaid: 0, amountPending: 0 }
+          ];
+        }
+        
+        if (paymentsData && paymentsData.value) {
+          payments = JSON.parse(paymentsData.value);
+        }
+        
+        if (requestsData && requestsData.value) {
+          paymentRequests = JSON.parse(requestsData.value);
+        }
+        
+        if (servicesData && servicesData.value) {
+          services = JSON.parse(servicesData.value);
+        }
+        
+        if (historicsData && historicsData.value) {
+          historics = JSON.parse(historicsData.value);
+        }
+        
+        if (currentYearData && currentYearData.value) {
+          currentYear = parseInt(currentYearData.value);
+        }
+        
+        if (logoData && logoData.value) {
+          appLogo = logoData.value;
+          displayLogo();
+        }
+      } catch (e) {
+        console.log('No previous data found, starting fresh');
+        friends = [
+          { id: 1, name: 'Tú', initials: 'TU', account: '', birthdate: '', email: '', photo: null, amountPaid: 0, amountPending: 0 }
+        ];
+      }
+      
+      calculateMemberBalances();
+      renderAll();
+      updateCurrentYearDisplay();
+    }
+    
+    // Save data to storage
+    async function saveData() {
+      try {
+        await window.storage.set('friends', JSON.stringify(friends));
+        await window.storage.set('payments', JSON.stringify(payments));
+        await window.storage.set('paymentRequests', JSON.stringify(paymentRequests));
+        await window.storage.set('services', JSON.stringify(services));
+        await window.storage.set('historics', JSON.stringify(historics));
+        await window.storage.set('currentYear', currentYear.toString());
+        if (appLogo) {
+          await window.storage.set('appLogo', appLogo);
+        }
+      } catch (e) {
+        console.error('Error saving data:', e);
+      }
+    }
+    
+    function getInitials(name) {
+      return name.split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+    
+    function toggleFabMenu() {
+      if (currentTab === 'group') {
+        openAddMember();
+      } else if (currentTab === 'services') {
+        openAddService();
+      } else {
+        fabMenuOpen = !fabMenuOpen;
+        document.getElementById('fabMenu').classList.toggle('active', fabMenuOpen);
+        document.getElementById('addButton').textContent = fabMenuOpen ? '×' : '+';
+      }
+    }
+    
+    function switchTab(tab) {
+      currentTab = tab;
+      fabMenuOpen = false;
+      document.getElementById('fabMenu').classList.remove('active');
+      document.getElementById('addButton').textContent = '+';
+      
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('overviewContent').style.display = 'none';
+      document.getElementById('paymentsContent').style.display = 'none';
+      document.getElementById('servicesContent').style.display = 'none';
+      document.getElementById('groupContent').style.display = 'none';
+      document.getElementById('settingsContent').style.display = 'none';
+      
+      if (tab === 'overview') {
+        document.getElementById('overviewContent').style.display = 'block';
+        document.getElementById('addButton').style.display = 'flex';
+        renderMemberPayments();
+      } else if (tab === 'payments') {
+        document.getElementById('paymentsContent').style.display = 'block';
+        document.getElementById('addButton').style.display = 'flex';
+        renderPayments();
+      } else if (tab === 'services') {
+        document.getElementById('servicesContent').style.display = 'block';
+        document.getElementById('addButton').style.display = 'flex';
+        renderServices();
+      } else if (tab === 'group') {
+        document.getElementById('groupContent').style.display = 'block';
+        document.getElementById('addButton').style.display = 'flex';
+        renderMembers();
+      } else if (tab === 'settings') {
+        document.getElementById('settingsContent').style.display = 'block';
+        document.getElementById('addButton').style.display = 'none';
+        displayLogo();
+        renderHistorics();
+        updateCurrentYearDisplay();
+      }
+    }
+    
+    function openAddPayment() {
+      fabMenuOpen = false;
+      document.getElementById('fabMenu').classList.remove('active');
+      document.getElementById('addButton').textContent = '+';
+      document.getElementById('addPaymentModal').classList.add('active');
+      renderMemberSelect();
+      document.getElementById('paymentConcept').value = '';
+      document.getElementById('paymentAmount').value = '';
+    }
+    
+    function openRequestPayment() {
+      fabMenuOpen = false;
+      document.getElementById('fabMenu').classList.remove('active');
+      document.getElementById('addButton').textContent = '+';
+      document.getElementById('requestPaymentModal').classList.add('active');
+      document.getElementById('requestConcept').value = '';
+      document.getElementById('requestAmount').value = '';
+      document.getElementById('requestDeadline').value = '';
+    }
+    
+    function openAddMember() {
+      tempMemberPhoto = null;
+      document.getElementById('addMemberModal').classList.add('active');
+      document.getElementById('memberName').value = '';
+      document.getElementById('memberBirthdate').value = '';
+      document.getElementById('memberEmail').value = '';
+      document.getElementById('memberAccount').value = '';
+      
+      // Reset photo preview
+      const photoPreview = document.getElementById('photoPreview');
+      photoPreview.innerHTML = '<div class="photo-placeholder">📷</div>';
+    }
+    
+    function closeModal() {
+      document.getElementById('addPaymentModal').classList.remove('active');
+      document.getElementById('requestPaymentModal').classList.remove('active');
+      document.getElementById('addMemberModal').classList.remove('active');
+      document.getElementById('addServiceModal').classList.remove('active');
+      document.getElementById('viewHistoricModal').classList.remove('active');
+    }
+    
+    function renderMemberSelect() {
+      const select = document.getElementById('paymentMember');
+      select.innerHTML = friends.map(f => 
+        `<option value="${f.id}">${f.name}</option>`
+      ).join('');
+    }
+    
+    function addPayment(e) {
+      e.preventDefault();
+      
+      const memberId = parseInt(document.getElementById('paymentMember').value);
+      const concept = document.getElementById('paymentConcept').value;
+      const amount = parseFloat(document.getElementById('paymentAmount').value);
+      const category = document.getElementById('paymentCategory').value;
+      
+      const payment = {
+        id: Date.now(),
+        memberId: memberId,
+        concept: concept,
+        amount: amount,
+        category: category,
+        date: new Date().toISOString()
+      };
+      
+      payments.unshift(payment);
+      calculateMemberBalances();
+      saveData();
+      renderAll();
+      closeModal();
+    }
+    
+    function requestPayment(e) {
+      e.preventDefault();
+      
+      const concept = document.getElementById('requestConcept').value;
+      const amount = parseFloat(document.getElementById('requestAmount').value);
+      const category = document.getElementById('requestCategory').value;
+      const deadline = document.getElementById('requestDeadline').value;
+      
+      const request = {
+        id: Date.now(),
+        concept: concept,
+        amountPerPerson: amount,
+        category: category,
+        deadline: deadline,
+        date: new Date().toISOString()
+      };
+      
+      paymentRequests.unshift(request);
+      calculateMemberBalances();
+      saveData();
+      renderAll();
+      closeModal();
+    }
+    
+    function addMember(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('memberName').value;
+      const birthdate = document.getElementById('memberBirthdate').value;
+      const email = document.getElementById('memberEmail').value;
+      const account = document.getElementById('memberAccount').value;
+      
+      const newMember = {
+        id: Date.now(),
+        name: name,
+        initials: getInitials(name),
+        account: account,
+        birthdate: birthdate,
+        email: email,
+        photo: tempMemberPhoto,
+        amountPaid: 0,
+        amountPending: 0
+      };
+      
+      friends.push(newMember);
+      tempMemberPhoto = null;
+      calculateMemberBalances();
+      saveData();
+      renderMembers();
+      closeModal();
+    }
+    
+    function deleteMember(id) {
+      const member = friends.find(f => f.id === id);
+      if (member.name === 'Tú') {
+        alert('No puedes eliminar tu propio perfil');
+        return;
+      }
+      
+      if (confirm(`¿Seguro que quieres eliminar a ${member.name}?`)) {
+        friends = friends.filter(f => f.id !== id);
+        payments = payments.filter(p => p.memberId !== id);
+        calculateMemberBalances();
+        saveData();
+        renderAll();
+      }
+    }
+    
+    function calculateMemberBalances() {
+      // Reset balances
+      friends.forEach(f => {
+        f.amountPaid = 0;
+        f.amountPending = 0;
+      });
+      
+      // Calculate paid amounts
+      payments.forEach(payment => {
+        const member = friends.find(f => f.id === payment.memberId);
+        if (member) {
+          member.amountPaid += payment.amount;
+        }
+      });
+      
+      // Calculate pending amounts (total requested - paid)
+      const requestedPerPerson = paymentRequests.reduce((sum, req) => sum + req.amountPerPerson, 0);
+      
+      friends.forEach(f => {
+        f.amountPending = Math.max(0, requestedPerPerson - f.amountPaid);
+      });
+    }
+    
+    function renderMemberPayments() {
+      const container = document.getElementById('memberPaymentsList');
+      
+      if (friends.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No hay miembros en la escuadra</p></div>';
+        return;
+      }
+      
+      container.innerHTML = friends.map(member => {
+        const requestedAmount = paymentRequests.reduce((sum, req) => sum + req.amountPerPerson, 0);
+        const isPaid = member.amountPending === 0 && requestedAmount > 0;
+        
+        const avatarContent = member.photo 
+          ? `<img src="${member.photo}" alt="${member.name}">`
+          : member.initials;
+        
+        return `
+          <div class="member-payment-card">
+            <div class="member-payment-header">
+              <div class="member-avatar">${avatarContent}</div>
+              <div class="member-info">
+                <div class="member-name">
+                  ${member.name}
+                  ${isPaid ? '<span class="status-badge paid">Al día</span>' : member.amountPending > 0 ? '<span class="status-badge pending">Pendiente</span>' : ''}
+                </div>
+                <div class="member-status">${member.account || 'Sin cuenta'}</div>
+              </div>
+            </div>
+            <div class="payment-status">
+              <div class="payment-status-item">
+                <div class="payment-status-label">Pagado</div>
+                <div class="payment-status-value" style="color: #10b981;">€${member.amountPaid.toFixed(2)}</div>
+              </div>
+              <div class="payment-status-item">
+                <div class="payment-status-label">Pendiente</div>
+                <div class="payment-status-value" style="color: #ef4444;">€${member.amountPending.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function uploadLogo(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        appLogo = e.target.result;
+        displayLogo();
+        saveData();
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function displayLogo() {
+      const logoPreview = document.getElementById('logoPreview');
+      const removeBtn = document.getElementById('removeLogoBtn');
+      
+      if (appLogo) {
+        logoPreview.innerHTML = `<img src="${appLogo}" alt="Logo">`;
+        removeBtn.style.display = 'block';
+      } else {
+        logoPreview.innerHTML = '<div class="logo-placeholder">⚔️</div>';
+        removeBtn.style.display = 'none';
+      }
+    }
+    
+    async function removeLogo() {
+      if (confirm('¿Seguro que quieres eliminar el logo?')) {
+        appLogo = null;
+        displayLogo();
+        try {
+          await window.storage.delete('appLogo');
+        } catch (e) {
+          console.error('Error deleting logo:', e);
+        }
+      }
+    }
+    
+    function previewMemberPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempMemberPhoto = e.target.result;
+        const photoPreview = document.getElementById('photoPreview');
+        photoPreview.innerHTML = `<img src="${tempMemberPhoto}" alt="Preview">`;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function openAddService() {
+      document.getElementById('addServiceModal').classList.add('active');
+      document.getElementById('serviceName').value = '';
+      document.getElementById('serviceAmount').value = '';
+      document.getElementById('serviceDueDay').value = '';
+      document.getElementById('serviceReminder').checked = false;
+      document.getElementById('reminderDays').value = '3';
+      document.getElementById('reminderDaysGroup').style.display = 'none';
+      renderServiceMembersCheckboxes();
+    }
+    
+    function renderServiceMembersCheckboxes() {
+      const container = document.getElementById('serviceMembers');
+      container.innerHTML = friends.map(f => `
+        <div class="member-checkbox-item">
+          <input type="checkbox" id="serviceMember-${f.id}" checked>
+          <label class="member-checkbox-label" for="serviceMember-${f.id}">${f.name}</label>
+        </div>
+      `).join('');
+    }
+    
+    // Toggle reminder days visibility
+    document.addEventListener('DOMContentLoaded', function() {
+      const reminderCheckbox = document.getElementById('serviceReminder');
+      if (reminderCheckbox) {
+        reminderCheckbox.addEventListener('change', function() {
+          document.getElementById('reminderDaysGroup').style.display = 
+            this.checked ? 'block' : 'none';
+        });
+      }
+    });
+    
+    function addService(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('serviceName').value;
+      const amount = parseFloat(document.getElementById('serviceAmount').value);
+      const period = document.getElementById('servicePeriod').value;
+      const dueDay = parseInt(document.getElementById('serviceDueDay').value);
+      const hasReminder = document.getElementById('serviceReminder').checked;
+      const reminderDays = parseInt(document.getElementById('reminderDays').value) || 3;
+      
+      const selectedMembers = friends
+        .filter(f => document.getElementById(`serviceMember-${f.id}`).checked)
+        .map(f => f.id);
+      
+      if (selectedMembers.length === 0) {
+        alert('Selecciona al menos un integrante');
+        return;
+      }
+      
+      const service = {
+        id: Date.now(),
+        name: name,
+        amount: amount,
+        period: period,
+        dueDay: dueDay,
+        hasReminder: hasReminder,
+        reminderDays: reminderDays,
+        members: selectedMembers,
+        created: new Date().toISOString()
+      };
+      
+      services.push(service);
+      saveData();
+      renderServices();
+      closeModal();
+    }
+    
+    function deleteService(id) {
+      if (confirm('¿Seguro que quieres eliminar este servicio?')) {
+        services = services.filter(s => s.id !== id);
+        saveData();
+        renderServices();
+      }
+    }
+    
+    function renderServices() {
+      const container = document.getElementById('servicesList');
+      
+      if (services.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p>No hay servicios creados.<br>Toca el botón + para añadir uno.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = services.map(service => {
+        const periodText = {
+          monthly: 'Mensual',
+          bimonthly: 'Bimensual',
+          quarterly: 'Trimestral',
+          annual: 'Anual',
+          custom: 'Personalizado'
+        }[service.period];
+        
+        const serviceMembers = friends.filter(f => service.members.includes(f.id));
+        const amountPerPerson = service.amount / service.members.length;
+        
+        return `
+          <div class="service-card">
+            <div class="service-header">
+              <div>
+                <div class="service-title">${service.name}</div>
+                <div class="service-info">
+                  <span>💰 €${service.amount.toFixed(2)}</span>
+                  <span>📅 ${periodText}</span>
+                  <span>📆 Día ${service.dueDay}</span>
+                  ${service.hasReminder ? `<span>🔔 ${service.reminderDays}d antes</span>` : ''}
+                </div>
+              </div>
+              <div class="service-amount">€${amountPerPerson.toFixed(2)}<br><span style="font-size: 12px; font-weight: 400; color: #666;">/persona</span></div>
+            </div>
+            
+            <div class="service-members-list">
+              ${serviceMembers.map(m => `<span class="service-member-badge">${m.name}</span>`).join('')}
+            </div>
+            
+            <div class="service-actions">
+              ${service.hasReminder ? `<button class="action-button" onclick="createCalendarReminder(${service.id})">📅 Añadir a calendario</button>` : ''}
+              <button class="action-button danger" onclick="deleteService(${service.id})">🗑️ Eliminar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function createCalendarReminder(serviceId) {
+      const service = services.find(s => s.id === serviceId);
+      if (!service || !service.hasReminder) return;
+      
+      // Calcular la próxima fecha de vencimiento
+      const today = new Date();
+      let nextDue = new Date(today.getFullYear(), today.getMonth(), service.dueDay);
+      
+      // Si ya pasó este mes, usar el próximo mes
+      if (nextDue <= today) {
+        nextDue = new Date(today.getFullYear(), today.getMonth() + 1, service.dueDay);
+      }
+      
+      // Fecha del recordatorio (X días antes)
+      const reminderDate = new Date(nextDue);
+      reminderDate.setDate(reminderDate.getDate() - service.reminderDays);
+      
+      // Crear archivo ICS
+      const icsContent = generateICS(service, nextDue, reminderDate);
+      
+      // Descargar el archivo ICS
+      const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `recordatorio-${service.name.replace(/\s+/g, '-')}.ics`;
+      link.click();
+    }
+    
+    function generateICS(service, dueDate, reminderDate) {
+      const formatDate = (date) => {
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      };
+      
+      const serviceMembers = friends.filter(f => service.members.includes(f.id));
+      const memberNames = serviceMembers.map(m => m.name).join(', ');
+      const amountPerPerson = service.amount / service.members.length;
+      
+      return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//40 Lladres//Recordatorio de Pago//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${service.id}-${Date.now()}@40lladres.app
+DTSTAMP:${formatDate(new Date())}
+DTSTART:${formatDate(reminderDate)}
+DTEND:${formatDate(reminderDate)}
+SUMMARY:💰 Recordatorio: ${service.name}
+DESCRIPTION:Vencimiento el día ${dueDate.getDate()}\\n\\nImporte total: €${service.amount.toFixed(2)}\\nImporte por persona: €${amountPerPerson.toFixed(2)}\\n\\nIntegrantes: ${memberNames}\\n\\nGenerado por 40 Lladres
+LOCATION:
+STATUS:CONFIRMED
+SEQUENCE:0
+BEGIN:VALARM
+TRIGGER:-PT${service.reminderDays * 24}H
+DESCRIPTION:Pago de ${service.name} - €${amountPerPerson.toFixed(2)}
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+    }
+    
+    function updateCurrentYearDisplay() {
+      const display = document.getElementById('currentYearDisplay');
+      if (display) {
+        display.textContent = currentYear;
+      }
+    }
+    
+    function closeCurrentYear() {
+      if (!confirm(`¿Seguro que quieres cerrar el año ${currentYear} y crear un histórico?\n\nEsto guardará todos los datos actuales (pagos, cuotas, servicios) y comenzará un nuevo año limpio.`)) {
+        return;
+      }
+      
+      // Calcular estadísticas del año
+      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalRequested = paymentRequests.reduce((sum, req) => sum + (req.amountPerPerson * friends.length), 0);
+      
+      // Crear el histórico
+      const historic = {
+        id: Date.now(),
+        year: currentYear,
+        closedDate: new Date().toISOString(),
+        friends: JSON.parse(JSON.stringify(friends)),
+        payments: JSON.parse(JSON.stringify(payments)),
+        paymentRequests: JSON.parse(JSON.stringify(paymentRequests)),
+        services: JSON.parse(JSON.stringify(services)),
+        stats: {
+          totalPaid: totalPaid,
+          totalRequested: totalRequested,
+          paymentCount: payments.length,
+          memberCount: friends.length,
+          serviceCount: services.length
+        }
+      };
+      
+      historics.push(historic);
+      
+      // Limpiar datos del año actual
+      payments = [];
+      paymentRequests = [];
+      
+      // Reiniciar balances de miembros
+      friends.forEach(f => {
+        f.amountPaid = 0;
+        f.amountPending = 0;
+      });
+      
+      // Incrementar el año
+      currentYear++;
+      
+      saveData();
+      calculateMemberBalances();
+      renderAll();
+      renderHistorics();
+      updateCurrentYearDisplay();
+      
+      alert(`✅ Histórico del año ${historic.year} creado con éxito.\n\nAhora estás trabajando en el año ${currentYear}.`);
+    }
+    
+    function renderHistorics() {
+      const container = document.getElementById('historicsList');
+      if (!container) return;
+      
+      if (historics.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999; font-size: 14px;">No hay históricos guardados</div>';
+        return;
+      }
+      
+      // Ordenar por año descendente
+      const sortedHistorics = [...historics].sort((a, b) => b.year - a.year);
+      
+      container.innerHTML = sortedHistorics.map(h => `
+        <div class="historic-card" onclick="viewHistoric(${h.id})">
+          <div class="historic-header">
+            <div class="historic-year">📅 Año ${h.year}</div>
+            <div style="font-size: 12px; color: #999;">
+              ${new Date(h.closedDate).toLocaleDateString('es-ES')}
+            </div>
+          </div>
+          <div class="historic-stats">
+            <div class="historic-stat">
+              <span class="historic-stat-label">Total pagado</span>
+              <span class="historic-stat-value">€${h.stats.totalPaid.toFixed(2)}</span>
+            </div>
+            <div class="historic-stat">
+              <span class="historic-stat-label">Nº pagos</span>
+              <span class="historic-stat-value">${h.stats.paymentCount}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    let currentHistoricId = null;
+    
+    function viewHistoric(historicId) {
+      const historic = historics.find(h => h.id === historicId);
+      if (!historic) return;
+      
+      currentHistoricId = historicId;
+      
+      document.getElementById('historicModalTitle').textContent = `Histórico ${historic.year}`;
+      
+      const content = `
+        <div class="historic-section">
+          <div class="historic-section-title">📊 Resumen general</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 11px; color: #999;">Total recaudado</div>
+              <div style="font-size: 18px; font-weight: 600; color: #10b981;">€${historic.stats.totalPaid.toFixed(2)}</div>
+            </div>
+            <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 11px; color: #999;">Total solicitado</div>
+              <div style="font-size: 18px; font-weight: 600; color: #dc2626;">€${historic.stats.totalRequested.toFixed(2)}</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <div style="background: #f9fafb; padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: #999;">Pagos</div>
+              <div style="font-size: 16px; font-weight: 600;">${historic.stats.paymentCount}</div>
+            </div>
+            <div style="background: #f9fafb; padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: #999;">Miembros</div>
+              <div style="font-size: 16px; font-weight: 600;">${historic.stats.memberCount}</div>
+            </div>
+            <div style="background: #f9fafb; padding: 10px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: #999;">Servicios</div>
+              <div style="font-size: 16px; font-weight: 600;">${historic.stats.serviceCount}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="historic-section">
+          <div class="historic-section-title">👥 Estado final de miembros</div>
+          ${historic.friends.map(member => `
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+              <span style="font-weight: 500;">${member.name}</span>
+              <div style="display: flex; gap: 12px; font-size: 14px;">
+                <span style="color: #10b981;">€${member.amountPaid.toFixed(2)}</span>
+                <span style="color: #ef4444;">€${member.amountPending.toFixed(2)}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${historic.services.length > 0 ? `
+          <div class="historic-section">
+            <div class="historic-section-title">⚙️ Servicios (${historic.services.length})</div>
+            ${historic.services.map(service => `
+              <div style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                <div style="font-weight: 500;">${service.name}</div>
+                <div style="font-size: 13px; color: #666;">€${service.amount.toFixed(2)} - ${service.members.length} integrantes</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <div class="historic-section">
+          <div class="historic-section-title">💳 Últimos pagos</div>
+          ${historic.payments.slice(0, 5).map(payment => {
+            const member = historic.friends.find(f => f.id === payment.memberId);
+            const date = new Date(payment.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+            return `
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                <div>
+                  <div style="font-weight: 500; font-size: 14px;">${payment.concept}</div>
+                  <div style="font-size: 12px; color: #666;">${member ? member.name : 'Desconocido'} - ${date}</div>
+                </div>
+                <span style="font-weight: 600; color: #10b981;">€${payment.amount.toFixed(2)}</span>
+              </div>
+            `;
+          }).join('')}
+          ${historic.payments.length > 5 ? `<div style="text-align: center; padding-top: 8px; font-size: 13px; color: #666;">Y ${historic.payments.length - 5} pagos más...</div>` : ''}
+        </div>
+      `;
+      
+      document.getElementById('historicDetailContent').innerHTML = content;
+      document.getElementById('viewHistoricModal').classList.add('active');
+    }
+    
+    function deleteHistoric() {
+      if (!currentHistoricId) return;
+      
+      const historic = historics.find(h => h.id === currentHistoricId);
+      if (!historic) return;
+      
+      if (!confirm(`¿Seguro que quieres eliminar el histórico del año ${historic.year}?\n\nEsta acción no se puede deshacer.`)) {
+        return;
+      }
+      
+      historics = historics.filter(h => h.id !== currentHistoricId);
+      currentHistoricId = null;
+      
+      saveData();
+      renderHistorics();
+      closeModal();
+      
+      alert('✅ Histórico eliminado correctamente.');
+    }
+    
+    function copySummaryToClipboard() {
+      const totalRequested = paymentRequests.reduce((sum, req) => sum + (req.amountPerPerson * friends.length), 0);
+      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalPending = Math.max(0, totalRequested - totalPaid);
+      
+      // Crear resumen con formato WhatsApp
+      let summary = `⚔️ *40 LLADRES - RESUMEN ${currentYear}*\n`;
+      summary += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      // Totales generales
+      summary += `📊 *TOTALES*\n`;
+      summary += `💰 Solicitado: €${totalRequested.toFixed(2)}\n`;
+      summary += `✅ Pagado: €${totalPaid.toFixed(2)}\n`;
+      summary += `⏳ Pendiente: €${totalPending.toFixed(2)}\n\n`;
+      
+      summary += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      // Estado por miembro
+      summary += `👥 *ESTADO POR MIEMBRO*\n\n`;
+      
+      friends.forEach(member => {
+        const requestedAmount = paymentRequests.reduce((sum, req) => sum + req.amountPerPerson, 0);
+        const isPaid = member.amountPending === 0 && requestedAmount > 0;
+        const status = isPaid ? '✅' : member.amountPending > 0 ? '⏳' : '➖';
+        
+        summary += `${status} *${member.name}*\n`;
+        summary += `   Pagado: €${member.amountPaid.toFixed(2)}\n`;
+        summary += `   Pendiente: €${member.amountPending.toFixed(2)}\n`;
+        
+        if (isPaid) {
+          summary += `   _¡Al día!_\n`;
+        }
+        summary += `\n`;
+      });
+      
+      summary += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      summary += `📅 Actualizado: ${new Date().toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}\n`;
+      
+      // Copiar al portapapeles
+      navigator.clipboard.writeText(summary).then(() => {
+        showToast('✅ Resumen copiado al portapapeles');
+      }).catch(err => {
+        // Fallback para navegadores que no soportan clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = summary;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showToast('✅ Resumen copiado al portapapeles');
+        } catch (err) {
+          alert('No se pudo copiar automáticamente. Aquí está el resumen:\n\n' + summary);
+        }
+        document.body.removeChild(textArea);
+      });
+    }
+    
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    function sendEmailReminder() {
+      // Filtrar miembros con pagos pendientes y que tengan email
+      const membersWithPending = friends.filter(f => f.amountPending > 0 && f.email && f.email.trim() !== '');
+      
+      if (membersWithPending.length === 0) {
+        alert('No hay miembros con pagos pendientes que tengan email configurado.');
+        return;
+      }
+      
+      // Crear lista de destinatarios
+      const recipients = membersWithPending.map(m => m.email).join(',');
+      
+      // Calcular totales
+      const totalRequested = paymentRequests.reduce((sum, req) => sum + (req.amountPerPerson * friends.length), 0);
+      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalPending = Math.max(0, totalRequested - totalPaid);
+      
+      // Crear asunto del email
+      const subject = encodeURIComponent(`⚔️ 40 Lladres - Recordatorio de pago ${currentYear}`);
+      
+      // Crear cuerpo del email
+      let body = `Hola compañeros de la escuadra,%0D%0A%0D%0A`;
+      body += `Os escribo para recordaros los pagos pendientes de este año.%0D%0A%0D%0A`;
+      
+      body += `📊 RESUMEN GENERAL:%0D%0A`;
+      body += `━━━━━━━━━━━━━━━━━━━━━%0D%0A`;
+      body += `💰 Total solicitado: €${totalRequested.toFixed(2)}%0D%0A`;
+      body += `✅ Total pagado: €${totalPaid.toFixed(2)}%0D%0A`;
+      body += `⏳ Total pendiente: €${totalPending.toFixed(2)}%0D%0A%0D%0A`;
+      
+      body += `👥 PENDIENTES POR PERSONA:%0D%0A`;
+      body += `━━━━━━━━━━━━━━━━━━━━━%0D%0A`;
+      
+      membersWithPending.forEach(member => {
+        body += `• ${member.name}: €${member.amountPending.toFixed(2)}%0D%0A`;
+      });
+      
+      body += `%0D%0A`;
+      
+      // Información de servicios activos si los hay
+      if (services.length > 0) {
+        body += `⚙️ SERVICIOS ACTIVOS:%0D%0A`;
+        body += `━━━━━━━━━━━━━━━━━━━━━%0D%0A`;
+        services.forEach(service => {
+          const amountPerPerson = service.amount / service.members.length;
+          body += `• ${service.name}: €${amountPerPerson.toFixed(2)}/persona%0D%0A`;
+        });
+        body += `%0D%0A`;
+      }
+      
+      // Información de cuenta bancaria si está disponible
+      const adminAccount = friends.find(f => f.name === 'Tú' && f.account);
+      if (adminAccount && adminAccount.account) {
+        body += `💳 CUENTA PARA TRANSFERENCIAS:%0D%0A`;
+        body += `${adminAccount.account}%0D%0A%0D%0A`;
+      }
+      
+      body += `Cualquier duda, no dudéis en contactar.%0D%0A%0D%0A`;
+      body += `Un saludo,%0D%0A`;
+      body += `40 Lladres ⚔️`;
+      
+      // Abrir cliente de correo
+      const mailtoLink = `mailto:${recipients}?subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink;
+      
+      showToast('📧 Cliente de correo abierto');
+    }
+    
+    function renderPayments() {
+      const container = document.getElementById('paymentsList');
+      
+      if (payments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p>No hay pagos registrados.<br>Usa el botón + para añadir uno.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = payments.map(payment => {
+        const member = friends.find(f => f.id === payment.memberId);
+        const date = new Date(payment.date);
+        const dateStr = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        return `
+          <div class="payment-item">
+            <div class="payment-header">
+              <div>
+                <div class="payment-title">${payment.concept}</div>
+                <div class="payment-meta">
+                  <span>👤 ${member ? member.name : 'Desconocido'}</span>
+                  <span>📅 ${dateStr}</span>
+                </div>
+                <span class="payment-category category-${payment.category}">${getCategoryName(payment.category)}</span>
+              </div>
+              <div class="payment-amount">€${payment.amount.toFixed(2)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderMembers() {
+      const container = document.getElementById('membersList');
+      
+      container.innerHTML = friends.map(member => {
+        let birthdateText = 'Sin fecha de nacimiento';
+        let age = '';
+        
+        if (member.birthdate) {
+          const birthDate = new Date(member.birthdate);
+          const today = new Date();
+          const ageYears = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age = ageYears - 1;
+          } else {
+            age = ageYears;
+          }
+          
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          birthdateText = birthDate.toLocaleDateString('es-ES', options);
+          age = ` (${age} años)`;
+        }
+        
+        const avatarContent = member.photo 
+          ? `<img src="${member.photo}" alt="${member.name}">`
+          : member.initials;
+        
+        return `
+        <div class="member-card">
+          <div class="member-header">
+            <div class="member-avatar">${avatarContent}</div>
+            <div class="member-info">
+              <div class="member-name">${member.name}</div>
+              <div class="member-account">${member.account || 'Sin número de cuenta'}</div>
+            </div>
+            ${member.name !== 'Tú' ? `
+              <button class="delete-member" onclick="deleteMember(${member.id})" title="Eliminar">×</button>
+            ` : ''}
+          </div>
+          <div class="member-details">
+            <div class="member-detail-item">
+              📅 ${birthdateText}${age}
+            </div>
+            ${member.email ? `
+              <div class="member-detail-item">
+                📧 ${member.email}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+    
+    function getCategoryName(category) {
+      const categories = {
+        cuota: '💰 Cuota',
+        comida: '🍽️ Comida y bebida',
+        vestuario: '👔 Vestuario',
+        transporte: '🚗 Transporte',
+        alojamiento: '🏠 Alojamiento',
+        fiesta: '🎉 Fiesta',
+        otros: '📌 Otros'
+      };
+      return categories[category] || category;
+    }
+    
+    function updateSummary() {
+      const totalRequested = paymentRequests.reduce((sum, req) => sum + (req.amountPerPerson * friends.length), 0);
+      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalPending = Math.max(0, totalRequested - totalPaid);
+      
+      document.getElementById('totalRequested').textContent = `€${totalRequested.toFixed(2)}`;
+      document.getElementById('totalPaid').textContent = `€${totalPaid.toFixed(2)}`;
+      document.getElementById('totalPending').textContent = `€${totalPending.toFixed(2)}`;
+    }
+    
+    function renderAll() {
+      renderMemberPayments();
+      renderPayments();
+      updateSummary();
+      if (currentTab === 'group') {
+        renderMembers();
+      }
+      if (currentTab === 'services') {
+        renderServices();
+      }
+    }
+    
+    // Initialize
+    loadData();
+    
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('Service Worker registrado con éxito:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Error al registrar Service Worker:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
