@@ -1242,46 +1242,46 @@
     let tempMemberPhoto = null;
     
     // Load data from storage
-    async function loadData() {
+    function loadData() {
       try {
-        const friendsData = await window.storage.get('friends');
-        const paymentsData = await window.storage.get('payments');
-        const requestsData = await window.storage.get('paymentRequests');
-        const servicesData = await window.storage.get('services');
-        const historicsData = await window.storage.get('historics');
-        const currentYearData = await window.storage.get('currentYear');
-        const logoData = await window.storage.get('appLogo');
+        const friendsData = localStorage.getItem('friends');
+        const paymentsData = localStorage.getItem('payments');
+        const requestsData = localStorage.getItem('paymentRequests');
+        const servicesData = localStorage.getItem('services');
+        const historicsData = localStorage.getItem('historics');
+        const currentYearData = localStorage.getItem('currentYear');
+        const logoData = localStorage.getItem('appLogo');
         
-        if (friendsData && friendsData.value) {
-          friends = JSON.parse(friendsData.value);
+        if (friendsData) {
+          friends = JSON.parse(friendsData);
         } else {
           friends = [
             { id: 1, name: 'Tú', initials: 'TU', account: '', birthdate: '', email: '', photo: null, amountPaid: 0, amountPending: 0 }
           ];
         }
         
-        if (paymentsData && paymentsData.value) {
-          payments = JSON.parse(paymentsData.value);
+        if (paymentsData) {
+          payments = JSON.parse(paymentsData);
         }
         
-        if (requestsData && requestsData.value) {
-          paymentRequests = JSON.parse(requestsData.value);
+        if (requestsData) {
+          paymentRequests = JSON.parse(requestsData);
         }
         
-        if (servicesData && servicesData.value) {
-          services = JSON.parse(servicesData.value);
+        if (servicesData) {
+          services = JSON.parse(servicesData);
         }
         
-        if (historicsData && historicsData.value) {
-          historics = JSON.parse(historicsData.value);
+        if (historicsData) {
+          historics = JSON.parse(historicsData);
         }
         
-        if (currentYearData && currentYearData.value) {
-          currentYear = parseInt(currentYearData.value);
+        if (currentYearData) {
+          currentYear = parseInt(currentYearData);
         }
         
-        if (logoData && logoData.value) {
-          appLogo = logoData.value;
+        if (logoData) {
+          appLogo = logoData;
           displayLogo();
         }
       } catch (e) {
@@ -1297,19 +1297,21 @@
     }
     
     // Save data to storage
-    async function saveData() {
+    function saveData() {
       try {
-        await window.storage.set('friends', JSON.stringify(friends));
-        await window.storage.set('payments', JSON.stringify(payments));
-        await window.storage.set('paymentRequests', JSON.stringify(paymentRequests));
-        await window.storage.set('services', JSON.stringify(services));
-        await window.storage.set('historics', JSON.stringify(historics));
-        await window.storage.set('currentYear', currentYear.toString());
+        localStorage.setItem('friends', JSON.stringify(friends));
+        localStorage.setItem('payments', JSON.stringify(payments));
+        localStorage.setItem('paymentRequests', JSON.stringify(paymentRequests));
+        localStorage.setItem('services', JSON.stringify(services));
+        localStorage.setItem('historics', JSON.stringify(historics));
+        localStorage.setItem('currentYear', currentYear.toString());
         if (appLogo) {
-          await window.storage.set('appLogo', appLogo);
+          localStorage.setItem('appLogo', appLogo);
         }
+        console.log('✅ Datos guardados correctamente');
       } catch (e) {
-        console.error('Error saving data:', e);
+        console.error('❌ Error al guardar datos:', e);
+        alert('Error al guardar los datos. Por favor, verifica que tienes espacio de almacenamiento disponible.');
       }
     }
     
@@ -1610,7 +1612,7 @@
         appLogo = null;
         displayLogo();
         try {
-          await window.storage.delete('appLogo');
+          localStorage.removeItem('appLogo');
         } catch (e) {
           console.error('Error deleting logo:', e);
         }
